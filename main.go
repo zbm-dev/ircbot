@@ -62,12 +62,21 @@ func main() {
 			github.PushEvent,
 			github.PullRequestEvent,
 			github.ForkEvent,
+			github.IssuesEvent,
 		)
 		if err != nil {
 			log.Println("Error parsing hook")
 			return
 		}
 		switch p := payload.(type) {
+		case github.IssuesPayload:
+			if p.Repository.Private {
+				return
+			}
+			if p.Action != "opened" && p.Action != "closed" && p.Action != "reopened" {
+				return
+			}
+			conn.Noticef(channel, "%s %s #%d [%s] (%s): %s", p.Sender.Login, p.Action, p.Issue.Number, p.Repository.Name, p.Issue.Title, p.Issue.HTMLURL)
 		case github.PullRequestPayload:
 			if p.Repository.Private {
 				return
