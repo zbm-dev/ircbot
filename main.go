@@ -61,6 +61,7 @@ func main() {
 		payload, err := hook.Parse(r,
 			github.PushEvent,
 			github.PullRequestEvent,
+			github.ForkEvent,
 		)
 		if err != nil {
 			log.Println("Error parsing hook")
@@ -101,6 +102,11 @@ func main() {
 			}
 			conn.Noticef(channel, "%s %spushed %d commit%s to %s (%s -> %s, new HEAD: %s)", p.Sender.Login, forced, n_commits,
 				commit_sfx, p.Repository.Name, before_sha, after_sha, shortMsg)
+		case github.ForkPayload:
+			if p.Repository.Private {
+				return
+			}
+			conn.Noticef(channel, "%s forked %s to %s: %s", p.Sender.Login, p.Repository.Name, p.Forkee.FullName, p.Forkee.HTMLURL)
 		}
 	})
 
