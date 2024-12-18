@@ -71,7 +71,7 @@ func main() {
 			if p.Repository.Private {
 				return
 			}
-			if p.Action != "opened" && p.Action != "closed" {
+			if p.Action != "opened" && p.Action != "closed" && p.Action != "reopened" {
 				return
 			}
 			conn.Noticef(channel, "%s %s #%d [%s] (%s)", p.Sender.Login, p.Action, p.Number, p.Repository.Name, p.PullRequest.Title)
